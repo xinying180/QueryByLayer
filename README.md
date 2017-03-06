@@ -1,16 +1,16 @@
-# QueryByLayer
+# ArcGIS Engine实现图层间空间选择的优化策略
 
 如果您是ArcGIS Engine开发人员，也许会有这样的困惑：为什么对两个要素图层进行空间选择，ArcMap中瞬间就出结果了，而Engine中则慢很多倍，尤其是当数据量大时，该速率甚至无法忍受。图层间如何实现高效的空间选择呢？相信阅读完下面的文章，答案会迎刃而解。
 
 下面就带着问题来开始今天的讨论吧。
 
-##问题：
+## 问题：
 
-###假如有一个居民点数据和一个建筑物数据，想要知道哪些居民点被建筑物所覆盖，如何实现？
+### 假如有一个居民点数据和一个建筑物数据，想要知道哪些居民点被建筑物所覆盖，如何实现？
 
-##答案：
+## 答案：
 
-###ArcMap中如何实现？
+### ArcMap中如何实现？
 
 ArcMap中实现此功能很简单，即使用菜单条上的Select By Location或者[Select Layer By Location](http://resources.arcgis.com/en/help/main/10.2/index.html#//001700000072000000)工具，数据（点要素类中含有600个点，面要素类中含有750个面）和结果如下图所示。
 
@@ -18,7 +18,7 @@ ArcMap中实现此功能很简单，即使用菜单条上的Select By Location�
 
 **用时：0.06秒**
 
-###ArcGIS Engine中如何实现呢？ 
+### ArcGIS Engine中如何实现呢？ 
 
 ArcGIS Engine中（相信很多用户是不太喜欢直接调用GP工具的）如何实现该功能呢？一般情况下会考虑使用[ISpatialFilter](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//00250000083n000000)结合遍历面要素来实现：
 
@@ -53,7 +53,7 @@ System.Runtime.InteropServices.Marshal.FinalReleaseComObject(cursor);
 
 怎么和ArcMap中效率差这么多啊，别急，下面就来看优化方法。
 
-###**优化1：创建空间缓存**
+### **优化1：创建空间缓存**
 
 使用[ISpatialCacheManager](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//002500000831000000)接口对要素类创建空间缓存，然后使用上面的方法遍历选择。如果对同一个范围进行多次空间查询的话，先构建空间缓存会提升效率，因为其降低了数据库的访问次数，比如下面场景，当然也很适用于我们的问题。
 
@@ -83,7 +83,7 @@ System.Runtime.InteropServices.Marshal.FinalReleaseComObject(cursor);
 
 可见，创建空间缓存后效率有所提升，但与ArcMap中调用GP相比，效率还差了几乎一个数量级。怎么办？
 
-###**优化2：使用[IGeometryBag](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//002m000001s8000000)接口**
+### **优化2：使用[IGeometryBag](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//002m000001s8000000)接口**
 
 细心的你也许会发现上述方法之所以慢，是因为执行了多次SelectFeatures方法，如果只执行一次，肯定会快很多。而我们开始介绍ISpatialFilter的Geometry属性时提到过，Geometry可以传入GeometryBag，那么GeometryBag是什么呢？GeometryBag是Geometry的集合，可以往里添加N个Geometry，好吧，既然GeometryBag是个集合，那我们就可以把遍历的面都添加进去，这样就可以只执行一次SelectFeatures，很显然可以提高效率。不过使用GeometryBag时有一点需要注意：**必须为其设置空间参考**，因为添加Geometry（即使原本有空间参考）到GeometryBag中时会丢失空间参考。此外，如果**为该GeometryBag创建空间索引会提高效率**。主要代码：
 
@@ -123,7 +123,7 @@ System.Runtime.InteropServices.Marshal.FinalReleaseComObject(cursor);
 
 喜大普奔！该方法居然比ArcMap中直接调用GP还要快？！可是我觉得代码稍显复杂，有没有更简化而且高效的方法呢？（居然还想要自行车…）
 
-###**优化3：使用[IQueryByLayer](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//002m000001s8000000)接口**
+### **优化3：使用[IQueryByLayer](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//002m000001s8000000)接口**
 
 IQueryByLayer接口就是用来进行图层间空间选择的！！！其FromLayer属性是指对哪个图层进行选择，这里即为点图层；其ByLayer属性是指查询几何所在的图层，即面图层；其LayerSelectionMethod就是两个图层间的空间关系，这里是**esriLayerSelectCompletelyWithin**（细心的同学注意到了吧，空间关系和ArcMap中使用的一模一样，ArcMap甚有可能就是用的该接口）；此外还有一个UseSelectedFeatures属性很重要，我开始没有设置，结果导致程序一直报下面的错误：
 
@@ -154,7 +154,7 @@ axMapControl1.Refresh();
 
 这种方法的代码比上面那种简单的多，而且用时也更少，这就是我认为既简单又高效的方法。由上可见，ArcGIS Engine中进行图层间的空间选择，方法使用正确了，确实会与ArcMap效率相当，甚至还要更快哦！
 
-###**总结一下：**
+### **总结一下：**
 
 本文仅以图层间的空间选择为例进行了优化，其实在进行空间查询时也可以采用文中的思想，比如：
 
@@ -163,7 +163,7 @@ axMapControl1.Refresh();
 3，	图层间的查询也是可以转化为空间选择的，使用IQueryByLayer接口获取[ISelectionSet](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//002500000801000000)，进而获取到所有的要素；
 4，	多次使用IRelationalOperator或者ITopologicalOperator接口进行空间关系的判断时也可以使用GeometryBag，但具体需要看所使用的方法是否支持GeometryBag。
 
-##Demo
+## Demo
 
 使用ArcGIS Engine 10.5，Visual Studio 2015编写，创建了MapControlApplication模版工程，然后添加菜单栏，分别使用了上面提到的方法进行测试。界面为：
 
@@ -171,6 +171,6 @@ axMapControl1.Refresh();
 
 *Tips：*测试时是直接加载的已有mxd，然后获取的图层，如果直接从数据源获取要素类，然后创建图层，再查询会相对慢些。
 
-###工程下载地址：
+### 工程下载地址：
 
 [QueryByLayer](https://github.com/xinying180/QueryByLayer)
