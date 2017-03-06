@@ -57,7 +57,7 @@ System.Runtime.InteropServices.Marshal.FinalReleaseComObject(cursor);
 
 使用[ISpatialCacheManager](http://resources.arcgis.com/en/help/arcobjects-net/componenthelp/index.html#//002500000831000000)接口对要素类创建空间缓存，然后使用上面的方法遍历选择。如果对同一个范围进行多次空间查询的话，先构建空间缓存会提升效率，因为其降低了数据库的访问次数，比如下面场景，当然也很适用于我们的问题。
 
-![空间缓存](http://img.blog.csdn.net/20170306152922943?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlueWluZzE4MA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast1)
+![空间缓存](http://img.blog.csdn.net/20170306152922943?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQveGlueWluZzE4MA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
 使用方法就是打开进行查询的要素类，为该范围创建空间缓存，执行查询，最后释放缓存。主要代码：
 
