@@ -1,0 +1,14 @@
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\QueryByLayer.exe
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\QueryByLayer.pdb
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\ESRI.ArcGIS.DataSourcesGDB.dll
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\ESRI.ArcGIS.Geodatabase.dll
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\ESRI.ArcGIS.Geometry.dll
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\ESRI.ArcGIS.DataSourcesGDB.xml
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\ESRI.ArcGIS.Geodatabase.xml
+D:\work\github\QueryByLayer\QueryByLayer\bin\Debug\ESRI.ArcGIS.Geometry.xml
+D:\work\github\QueryByLayer\QueryByLayer\obj\x86\Debug\QueryByLayer.csprojResolveAssemblyReference.cache
+D:\work\github\QueryByLayer\QueryByLayer\obj\x86\Debug\QueryByLayer.MainForm.resources
+D:\work\github\QueryByLayer\QueryByLayer\obj\x86\Debug\QueryByLayer.Properties.Resources.resources
+D:\work\github\QueryByLayer\QueryByLayer\obj\x86\Debug\QueryByLayer.csproj.GenerateResource.Cache
+D:\work\github\QueryByLayer\QueryByLayer\obj\x86\Debug\QueryByLayer.exe
+D:\work\github\QueryByLayer\QueryByLayer\obj\x86\Debug\QueryByLayer.pdb
